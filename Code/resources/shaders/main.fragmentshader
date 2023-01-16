@@ -1,0 +1,148 @@
+#version 330 core
+// structs declaration
+struct Light {
+    vec3 color;
+    float ambient;
+    vec3 lightPosition_worldspace;
+    vec3 direction;
+    float power;
+};
+
+struct Material {
+    vec3 Ka; 
+    vec3 Kd;
+    vec3 Ks;
+    float Ns; 
+};
+
+// functions declaration
+float ShadowCalculation_directLight(vec4 _vertexPositionLightspace, sampler2D _shadowMapSampler);
+vec4 phong_directLight(Light _light, Material _mtl);
+Material computeMaterialCoeef();
+
+// I/O
+in vec3 vertex_position_cameraspace;
+in vec4 vertex_position_lightspace;
+in vec3 vertex_normal_cameraspace;
+in vec2 vertex_UV;
+in float _life;
+flat in int ID;
+out vec4 fragmentColor;
+
+// uniforms
+uniform mat4 P;
+uniform mat4 V;
+uniform sampler2D textureSamplerDiffuse;
+uniform sampler2D shadowMapSampler;
+uniform float time;
+uniform float num_of_bodies;
+uniform Light light;
+uniform Material mtl;
+
+
+
+void main() {  
+    Material myMaterial = computeMaterialCoeef();
+    fragmentColor = phong_directLight(light, myMaterial);
+}
+
+
+Material computeMaterialCoeef(){
+    float _ID = (ID/num_of_bodies); //normalize to 0-1
+    float offset = time * ( -num_of_bodies/2 + ID);
+    //offset = 0;
+    vec2 newUV = vec2(vertex_UV.x + offset, vertex_UV.y );
+
+    Material _mtl;
+    _mtl.Ka = texture(textureSamplerDiffuse, newUV).rgb;
+    _mtl.Kd = texture(textureSamplerDiffuse, newUV).rgb;
+    _mtl.Ks = mtl.Ks;
+    _mtl.Ns = mtl.Ns;
+
+    return _mtl;
+}
+
+
+vec4 phong_directLight(Light _light, Material _mtl){
+    vec3 color = _light.color;
+    float ambient = _light.ambient;
+    float power = _light.power;
+
+    vec3 Ka, Kd, Ks;
+    float Ns;
+
+    Ka = _mtl.Ka;
+    Kd = _mtl.Kd;
+    Ks = _mtl.Ks;
+    Ns = _mtl.Ns;
+
+    vec3 vertexPositionCameraspace = vertex_position_cameraspace;
+    vec3 vertexNormalCameraspace = vertex_normal_cameraspace;
+    vec3 lightPositionCameraspace = vec3(V * vec4(light.lightPosition_worldspace, 1.0));
+    vec3 lightDirectionCameraspace = vec3(V * vec4(light.direction, 0.0));
+
+    // model ambient intensity (Ia)
+    vec3 Ia = Ka * color * ambient;
+
+    // model diffuse intensity (Id)
+    vec3 N = normalize(vertexNormalCameraspace);
+    //vec3 L = normalize(lightPositionCameraspace - vertexPositionCameraspace);
+    //vec3 L = normalize((V * vec4(light.lightPosition_worldspace, 1)).xyz - vertex_position_cameraspace);
+    vec3 L = -normalize(lightDirectionCameraspace);
+    float cosTheta = clamp(dot(L, N), 0, 1);
+    vec3 Id = Kd * color * cosTheta * power;
+
+    // model specular intensity (Is)
+    vec3 R = reflect(-L, N);
+    vec3 E = normalize(-vertexPositionCameraspace);
+    float cosAlpha = clamp(dot(E, R), 0, 1);
+    float specular_factor = pow(cosAlpha, Ns);
+    vec3 Is = Ks * color * specular_factor * power;
+
+    float shadow = ShadowCalculation_directLight(vertex_position_lightspace, shadowMapSampler);
+    float visibility = 1.0f - shadow;
+
+    Ia = Ia;
+    Id = Id * visibility;
+    Is = Is * visibility;
+    
+    vec4 frag_color = vec4((Ia + Id + Is), _life);
+    return frag_color;
+}
+
+
+
+float ShadowCalculation_directLight(vec4 _vertexPositionLightspace, sampler2D _shadowMapSampler){
+    float shadow = 0.0f;
+
+    // Perspective devide to bring coordinates in range[-1, 1]
+    vec3 projCoords = _vertexPositionLightspace.xyz / _vertexPositionLightspace.w;
+
+    if(projCoords.z <= 1.0){
+        // Since the depth map values are in range[0, 1]
+        projCoords = projCoords*0.5 + 0.5;
+
+        // Then we get the depth of the current vertex
+        float currentDepth = projCoords.z;
+
+        // Correcting the quantization problem
+        float bias = 0.005;
+
+		// Smoothens out the shadows
+		int sampleRadius = 2;
+        vec2 depthMap_dimensions = textureSize(_shadowMapSampler, 0);
+        vec2 texelSize = 1.0 / depthMap_dimensions;
+
+        for(int x = -sampleRadius; x <= sampleRadius; x++ ){
+            for(int y = -sampleRadius; y <= sampleRadius; y++ ){
+                float closestDepth  = texture(_shadowMapSampler, projCoords.xy + vec2(x, y) * texelSize).r;
+                //if (currentDepth > closestDepth + bias) { shadow += 1.0f;}
+                shadow += currentDepth > closestDepth + bias ? 1.0 : 0.0; 
+            }
+        }
+
+        // Get average shadow
+		shadow /= pow((sampleRadius * 2 + 1), 2);
+    }
+    return shadow;
+}

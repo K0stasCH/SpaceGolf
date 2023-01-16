@@ -1,0 +1,59 @@
+#version 330 core
+
+layout (location = 0)  in vec3  vertexPosition_modelspace;
+layout (location = 1)  in vec3  vertexNormal_modelspace;
+layout (location = 2)  in vec2  vertexUV;
+layout (location = 3)  in mat4  translationMatrix;
+layout (location = 7)  in mat4  rotationMatrix;
+layout (location = 11) in float scale;
+layout (location = 12) in float life;
+
+// I/O
+out vec3 vertex_position_cameraspace;
+out vec4 vertex_position_lightspace;
+out vec3 vertex_normal_cameraspace;
+out vec2 vertex_UV;
+out float _life;
+flat out int ID;
+
+uniform mat4 P;
+uniform mat4 V;
+uniform mat4 light_VP;
+uniform mat4 modelMat;       //only when enableInstacing==0
+uniform int enableInstacing; //1->enabled, 0->disabled
+uniform int moonsEnabled;    //1->enabled, 0->disabled
+
+
+void main() {
+    _life = 1;
+
+    mat4 M = mat4(1.0f); //modelMatrix
+    if (enableInstacing==1){
+        _life = life;
+
+        mat4 scaleMat = mat4(scale);
+        scaleMat[3][3] = 1;
+
+        if (moonsEnabled == 1){
+            gl_Position =  P * V * rotationMatrix * translationMatrix * vec4(vertexPosition_modelspace * scale, 1);
+            M = rotationMatrix *  translationMatrix * scaleMat;
+        }
+        else{
+            gl_Position =  P * V * translationMatrix * rotationMatrix * vec4(vertexPosition_modelspace * scale, 1);
+            M = translationMatrix * rotationMatrix * scaleMat;
+        }
+    }
+    else if(enableInstacing==0){
+        gl_Position =  P * V * modelMat * vec4(vertexPosition_modelspace, 1);
+        M = modelMat;
+    }
+
+    ID = gl_InstanceID;
+
+    vec3 vertex_position_worldspace = (M * vec4(vertexPosition_modelspace, 1)).xyz;
+
+    vertex_position_cameraspace = (V * M * vec4(vertexPosition_modelspace, 1)).xyz;
+    vertex_normal_cameraspace = (V * M * vec4(vertexNormal_modelspace, 0)).xyz; 
+    vertex_UV = vertexUV;
+    vertex_position_lightspace = light_VP * vec4(vertex_position_worldspace, 1.0f);
+}

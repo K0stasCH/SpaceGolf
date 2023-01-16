@@ -1,0 +1,28 @@
+#version 330
+
+in vec2 uv;
+out vec4 frag_colour;
+
+
+uniform sampler2D textureSampler;
+uniform float near_plane;
+uniform float far_plane;
+
+
+float LinearizeDepth(float depth, float _nearPlane, float _farPlane){
+    float z = depth * 2.0 - 1.0; // Values in [-1, 1]
+    return (2.0 * _nearPlane * _farPlane) / (_farPlane + _nearPlane - z * (_farPlane - _nearPlane));
+}
+
+
+void main () {
+
+  frag_colour = vec4(1.0f);
+
+  vec4 colour = texture(textureSampler, uv);
+  
+  //float depth = LinearizeDepth(colour.r, near_plane, far_plane);
+  float depth = colour.r;
+
+  frag_colour = vec4(depth, depth, depth, 1.0);
+} 
