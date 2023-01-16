@@ -2,6 +2,12 @@
 Project for "Graphics and Virtual Reality" class.
 
 ## Tasks
+1. Create planets using instacing
+2. Model the gravitational pull of the planets
+3. Create moons around some planets with the same properties
+4. Use direct lighting, create a blank plane to project the shadows on
+5. The thrown object leave a trail of particles as it moves
+6. Create a target and allow the user to decide where the ball is thrown
 
 ## Dependencies
 * [GLEW](https://github.com/nigels-com/glew) 1.13.0
