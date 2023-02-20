@@ -21,6 +21,8 @@ public:
     int active_particles = 0; //number of particles that have been instantiated
     float dist_threshold = 10.0f; //data member for collision checking
 
+    int numOfTextures = 1;
+
 private:
     void loadTexture();
 

@@ -38,7 +38,7 @@ uniform float time;
 uniform float num_of_bodies;
 uniform Light light;
 uniform Material mtl;
-
+uniform int numOfTextures;
 
 
 void main() {  
@@ -46,12 +46,17 @@ void main() {
     fragmentColor = phong_directLight(light, myMaterial);
 }
 
-
+// finding the right texture and moving as the simulation runnung
 Material computeMaterialCoeef(){
-    float _ID = (ID/num_of_bodies); //normalize to 0-1
-    float offset = time * ( -num_of_bodies/2 + ID);
+    //int numOfTextures = 3;
+    float selectedTexture = mod(ID,numOfTextures);
+
+    //float _ID = (ID/num_of_bodies); //normalize to 0-1
+    //moving the tuexture
+    float offsetMoving = time * ( -num_of_bodies/2 + ID);
     //offset = 0;
-    vec2 newUV = vec2(vertex_UV.x + offset, vertex_UV.y );
+
+    vec2 newUV = vec2(vertex_UV.x + offsetMoving, (vertex_UV.y + selectedTexture) / numOfTextures);
 
     Material _mtl;
     _mtl.Ka = texture(textureSamplerDiffuse, newUV).rgb;
@@ -107,6 +112,8 @@ vec4 phong_directLight(Light _light, Material _mtl){
     Is = Is * visibility;
     
     vec4 frag_color = vec4((Ia + Id + Is), _life);
+    //vec4 frag_color = vec4(Ia/0.2, _life);
+
     return frag_color;
 }
 

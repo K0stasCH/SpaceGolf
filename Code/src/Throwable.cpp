@@ -46,7 +46,13 @@ glm::vec3 Throwable::computeForce(Planet* _planets, Moon* _moons) {
     }
 
     for (int i = 0; i < _moons->number_of_bodies; i++) {
-        float distance = glm::length(_moons->_attributes[i].position - this->_state.position);
+        //due to movement of moons we need to compute the currnet position of it
+        vec4 currentPositionMoon = glm::rotate(mat4(1.0f), _moons->_attributes[i].rot_angle, _moons->_attributes[i].rot_axis) * vec4(_moons->_attributes[i].position,1.0f);
+        //if (i == 0) {
+        //    std::cout << currentPositionMoon.x <<" "<< currentPositionMoon.y <<" "<< currentPositionMoon.z << std::endl;
+        //}
+
+        float distance = glm::length(this->_state.position - vec3(currentPositionMoon));
 
         //Because the mass of planets are used as scale factor, the mass-values are very small
         //So we add a factor 1E+10
@@ -54,6 +60,7 @@ glm::vec3 Throwable::computeForce(Planet* _planets, Moon* _moons) {
 
         vec3 tempForce = tempForce_Magnitude * glm::normalize(_moons->_attributes[i].position - this->_state.position);
         totalForce += tempForce;
+
     }
 
     return totalForce;

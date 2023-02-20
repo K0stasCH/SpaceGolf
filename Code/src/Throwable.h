@@ -43,6 +43,8 @@ public:
 	bool enabledParticleTail;
 	ParticleTail* tail;
 
+	int numOfTextures = 1;
+
 private:
 	glm::vec3 computeForce(Planet* _planets, Moon* _moons);
 	void loadTexture();

@@ -107,7 +107,7 @@ void Scene::uploadLight() {
     glUniform3fv(glGetUniformLocation(this->mainShaderProgram, "light.direction"), 1, &(light->direction[0]));
     glUniform1f(glGetUniformLocation(this->mainShaderProgram, "light.power"), light->power);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "light_VP"), 1, GL_FALSE, &(light->lightVP())[0][0]);
-    
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myLight->numOfTextures);
 }
 
 void Scene::uploadShadowMap() {
@@ -121,6 +121,7 @@ void Scene::uploadInfoPlanets() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), myPlanets->number_of_bodies);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(mat4(1.0))[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myPlanets->numOfTextures);
     uploadMaterial(0);
 }
 
@@ -129,6 +130,7 @@ void Scene::uploadInfoMoons() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 1);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), myMoons->number_of_bodies);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(mat4(1.0))[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myMoons->numOfTextures);
     uploadMaterial(1);
 }
 
@@ -137,6 +139,7 @@ void Scene::uploadInfoThrowable() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), 1);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(myThrowable->modelMatrix)[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myThrowable->numOfTextures);
     uploadMaterial(2);
 }
 
@@ -145,6 +148,7 @@ void Scene::uploadInfoLight_Plane() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), 1);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(myLight->modelMatrixPlane)[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myLight->numOfTextures);
 }
 
 void Scene::uploadInfoLight_Source() {
@@ -152,6 +156,7 @@ void Scene::uploadInfoLight_Source() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), 1);
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(myLight->modelMatrixSource)[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myLight->numOfTextures);
 }
 
 void Scene::uploadInfoTail() {
@@ -159,6 +164,7 @@ void Scene::uploadInfoTail() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), 1); //because we dont want to move the texure
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(mat4(1.0))[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myThrowable->tail->numOfTextures);
     uploadMaterial(2);
 }
 
@@ -167,6 +173,7 @@ void Scene::uploadInfoTarget() {
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "moonsEnabled"), 0);
     glUniform1i(glGetUniformLocation(this->mainShaderProgram, "num_of_bodies"), 1); //because we dont want to move the texure
     glUniformMatrix4fv(glGetUniformLocation(this->mainShaderProgram, "modelMat"), 1, GL_FALSE, &(myTarget->modelMatrix)[0][0]);
+    glUniform1i(glGetUniformLocation(this->mainShaderProgram, "numOfTextures"), this->myTarget->numOfTextures);
     uploadMaterial(3);
 }
 

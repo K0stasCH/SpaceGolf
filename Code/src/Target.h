@@ -30,6 +30,8 @@ public:
 	glm::mat4 modelMatrix;
 	material mtl;
 
+	int numOfTextures = 1;
+
 private:
 	void loadTexture();
 

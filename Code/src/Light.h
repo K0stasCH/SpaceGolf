@@ -53,6 +53,8 @@ public:
     bool sphericalTrajectory;
     float posHorizontalAngle, posVerticalAngle, posR; //coordinates when we move on a sphere
 
+    int numOfTextures = 1;
+
 private:
     void loadTexture();
     //Move on the surface of a sphere

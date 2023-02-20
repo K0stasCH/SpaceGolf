@@ -25,11 +25,13 @@ public :
 public:
 	float terrainLimit = 100;
 	material mtl;
+
+	int numOfTextures = 3;
 	
 private:
 	void loadTexture();
 
 private:
-	std::string texturePath_diffuse = "../resources/textures/planet-dif.png";
+	std::string texturePath_diffuse = "../resources/textures/planetsAtlas.png";
 	GLuint textureDiffuse;
 };

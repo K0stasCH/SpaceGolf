@@ -9,7 +9,7 @@ Light::Light(GLFWwindow* window) : Movable(window) {
 
     // setting near and far plane affects the detail of the shadow
     nearPlane = 0.01;
-    farPlane = 50.0;
+    farPlane = 100.0;
 
     projectionMatrix = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
     //orthoProj = true;

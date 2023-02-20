@@ -29,12 +29,14 @@ public:
 	int actualMoons;
 	material mtl;
 
+	int numOfTextures = 3;
+
 private:
 	void loadTexture();
 
 private:
 	Planet* _planets_ptr;
-	std::string texturePath = "../resources/textures/moon-dif.bmp";
+	std::string texturePath = "../resources/textures/moonsAtlas.png";
 	GLuint texture;
 
 };
